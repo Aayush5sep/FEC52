@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Your Location</title>
+  <style>
+    #map {
+      height: 400px;
+      width: 100%;
+    }
+  </style>
+  <script>
+    // Set up global variables for the map, marker, and geocoder objects
+    let map, marker, geocoder, openCageKey, geolat, geolong;
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(showPosition);
+    } else {
+      console.log("Geolocation is not supported by this browser.");
+    }
+
+    function showPosition(position) {
+      geolat = position.coords.latitude;
+      geolong = position.coords.longitude;
+    }
+
+    // Initialize the Google Maps API and create a draggable marker
+    function initMap() {
+      // Set up the map center and zoom level
+      const center = { lat: parseFloat(geolat), lng: parseFloat(geolong) };
+      const zoom = 12;
+
+      // Create a new Google Maps object
+      map = new google.maps.Map(document.getElementById("map"), {
+        center: center,
+        zoom: zoom,
+      });
+
+      // Create a new draggable marker
+      marker = new google.maps.Marker({
+        map: map,
+        draggable: true,
+        animation: google.maps.Animation.DROP,
+        position: center,
+      });
+
+      // Update the latitude, longitude, and address fields when the marker is dragged or clicked
+      marker.addListener("dragend", updateFields);
+      marker.addListener("click", updateFields);
+
+      const latlng = marker.getPosition();
+      const lat = latlng.lat();
+      const lng = latlng.lng();
+
+      // Update the latitude and longitude fields
+      document.getElementById("latitude").value = lat;
+      document.getElementById("longitude").value = lng;
+    }
+
+    // Initialize the OpenCage Geocoder API and set the API key
+    function initOpenCage() {
+      // Set the OpenCage API key
+      openCageKey = "f239567f1362408b9b11c0e984406763";
+
+      // Create a new OpenCage Geocoder object
+      geocoder = new OpenCageGeocoder({
+        key: openCageKey
+      });
+    }
+
+    // Update the latitude, longitude, and address fields based on the marker position
+    function updateFields() {
+      // Get the latitude and longitude of the marker position
+      const latlng = marker.getPosition();
+      const lat = latlng.lat();
+      const lng = latlng.lng();
+
+      // Update the latitude and longitude fields
+      document.getElementById("latitude").value = lat;
+      document.getElementById("longitude").value = lng;
+
+    }
+  </script>
+</head>
+<body>
+  <h1>Location For Donation & Recieval</h1>
+  <div id="map"></div>
+  <label for="latitude">Latitude:</label>
+  <input type="text" id="latitude">
+  <label for="longitude">Longitude:</label>
+  <input type="text" id="longitude">
+  <input type="text" id="address" hidden>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCZ-TdgLRogqiElW5Mx7phxdNG7fnywBqI&callback=initMap"
+  async defer></script>
+  <script src="https://api.opencagedata.com/geocoder/v1/opencage-geocoder.js"></script>
+  <script>
+    // Initialize the map and geocoder APIs when the page loads
+    window.onload = () => {
+      initMap();
+      initOpenCage();
+    };
+  </script>
+</body>
+</html>
+
+<!-- 
+if (navigator.geolocation) {
+  navigator.geolocation.getCurrentPosition(showPosition);
+} else {
+  console.log("Geolocation is not supported by this browser.");
+}
+
+function showPosition(position) {
+  const latitude = position.coords.latitude;
+  const longitude = position.coords.longitude;
+  console.log("Latitude: " + latitude);
+  console.log("Longitude: " + longitude);
+} -->
